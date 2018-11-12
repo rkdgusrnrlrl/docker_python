@@ -1,11 +1,12 @@
 import docker
 from docker.errors import NotFound
 
+# input field
 PROJECT_NAME = 'simple_flask_app'
 VERSION = '0.1'
 
+# will made use input field
 IMAGE_TAG = '%s:%s' % (PROJECT_NAME, VERSION)
-
 CONTANIER_NAME = '%s_cont' % PROJECT_NAME
 
 CLIENT = docker.from_env()
