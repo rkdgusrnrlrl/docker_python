@@ -1,3 +1,5 @@
+import json
+
 import docker
 from docker.errors import NotFound
 
@@ -9,7 +11,11 @@ VERSION = '0.1'
 IMAGE_TAG = '%s:%s' % (PROJECT_NAME, VERSION)
 CONTANIER_NAME = '%s_cont' % PROJECT_NAME
 
+HOST_PORT = 5000
+CONT_PORT = 5000
+
 CLIENT = docker.from_env()
+CLIENT_API = docker.APIClient(base_url='unix://var/run/docker.sock')
 
 
 def find_image(imagename):
@@ -29,7 +35,18 @@ def find_container(name):
 
 
 def build_image(name, path):
-    return CLIENT.images.build(tag=name, path=path)[0]
+    print('start build')
+
+    generator = CLIENT_API.build(tag=name, path=path)
+
+    for output in generator:
+        oo = output.decode('utf-8').strip('\r\n')
+        json_output = json.loads(oo)
+
+        if 'stream' in json_output:
+            print(json_output['stream'].strip('\n'))
+
+    return find_image(IMAGE_TAG)
 
 
 def remove_image(name):
@@ -67,7 +84,7 @@ def run():
     img = build_image(IMAGE_TAG, '.')
     print('build image(%s)' % img.tags[0])
 
-    cont = run_container(CONTANIER_NAME, 5000, 5000, IMAGE_TAG)
+    cont = run_container(CONTANIER_NAME, HOST_PORT, CONT_PORT, IMAGE_TAG)
     print('run container(%s)' % cont.name)
 
 
