@@ -59,27 +59,20 @@ def if_exist_cont_then_remove(contanier_name):
         print('not exist constainer(%s)' % contanier_name)
 
 
-def clear_container_with_no_img():
+def clear_all_container():
     list = CLIENT.containers.list(all=True)
     for cont in list:
-        try:
-            if (len(cont.image.tags) == 0):
-                cont.remove(force=True)
+        cont.remove(force=True)
 
-        except ImageNotFound as e:
-            cont.remove(force=True)
-
-
-def clear_image_with_no_tag():
+def clear_all_image():
     list = CLIENT.images.list()
     for img in list:
-        if (len(img.tags) == 0):
-            remove_image(img.id)
+        remove_image(img.id)
 
 
 def run():
-    clear_container_with_no_img()
-    clear_image_with_no_tag()
+    clear_all_container()
+    clear_all_image()
 
 
 run()
